@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getRoutines, createRoutine, updateRoutine, deleteRoutine } from '../api/routines'
 import type { Routine } from '../types/routine'
 
-export function useRoutines() {
+export function useRoutines(lifeAreaId?: string) {
   return useQuery({
-    queryKey: ['routines'],
-    queryFn: getRoutines,
+    queryKey: ['routines', lifeAreaId],
+    queryFn: () => getRoutines(lifeAreaId),
   })
 }
 

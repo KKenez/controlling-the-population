@@ -1,8 +1,15 @@
 // Routine types
 
-export type LifeArea = 'fitness' | 'work' | 'personal' | 'social' | 'learning' | 'health'
-
 export type PriorityLevel = 'critical' | 'high' | 'medium' | 'low' | 'flexible'
+
+export interface LifeArea {
+  id: string
+  name: string
+  color: string
+  icon: string
+  description: string
+  routineCount: number
+}
 
 export interface TimeConstraint {
   earliestStart?: string // HH:MM
@@ -14,7 +21,7 @@ export interface TimeConstraint {
 export interface Routine {
   id: string
   name: string
-  lifeArea: LifeArea
+  lifeAreaId: string
   description: string
   priority: PriorityLevel
   frequencyPerWeek: number

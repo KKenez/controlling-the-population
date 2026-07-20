@@ -1,8 +1,9 @@
 import type { Routine } from '../types/routine'
 import { apiGet, apiPost, apiPatch, apiDelete } from './client'
 
-export function getRoutines(): Promise<Routine[]> {
-  return apiGet('/api/routines')
+export function getRoutines(lifeAreaId?: string): Promise<Routine[]> {
+  const qs = lifeAreaId ? `?lifeAreaId=${lifeAreaId}` : ''
+  return apiGet(`/api/routines${qs}`)
 }
 
 export function getRoutine(id: string): Promise<Routine> {

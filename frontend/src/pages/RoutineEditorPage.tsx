@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useRoutines, useCreateRoutine, useUpdateRoutine } from '../hooks/useRoutines'
-import type { LifeArea, PriorityLevel, TimeConstraint } from '../types/routine'
+import { useLifeAreas } from '../hooks/useLifeAreas'
+import type { PriorityLevel, TimeConstraint } from '../types/routine'
 
-const LIFE_AREAS: LifeArea[] = ['fitness', 'work', 'personal', 'social', 'learning', 'health']
 const PRIORITIES: PriorityLevel[] = ['critical', 'high', 'medium', 'low', 'flexible']
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 export default function RoutineEditorPage() {
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const { data: routines } = useRoutines()
+  const { data: lifeAreas } = useLifeAreas()
   const createMutation = useCreateRoutine()
   const updateMutation = useUpdateRoutine()
 
@@ -18,7 +20,7 @@ export default function RoutineEditorPage() {
   const existing = routines?.find((r) => r.id === id)
 
   const [name, setName] = useState('')
-  const [lifeArea, setLifeArea] = useState<LifeArea>('fitness')
+  const [lifeAreaId, setLifeAreaId] = useState(searchParams.get('areaId') || '')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<PriorityLevel>('medium')
   const [frequencyPerWeek, setFrequencyPerWeek] = useState(3)
@@ -28,7 +30,7 @@ export default function RoutineEditorPage() {
   useEffect(() => {
     if (existing) {
       setName(existing.name)
-      setLifeArea(existing.lifeArea)
+      setLifeAreaId(existing.lifeAreaId)
       setDescription(existing.description)
       setPriority(existing.priority)
       setFrequencyPerWeek(existing.frequencyPerWeek)
@@ -41,7 +43,7 @@ export default function RoutineEditorPage() {
     e.preventDefault()
     const data = {
       name,
-      lifeArea,
+      lifeAreaId,
       description,
       priority,
       frequencyPerWeek,
@@ -94,12 +96,14 @@ export default function RoutineEditorPage() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Life Area</label>
             <select
-              value={lifeArea}
-              onChange={(e) => setLifeArea(e.target.value as LifeArea)}
+              value={lifeAreaId}
+              onChange={(e) => setLifeAreaId(e.target.value)}
+              required
               className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              {LIFE_AREAS.map((area) => (
-                <option key={area} value={area}>{area}</option>
+              <option value="">Select a life area...</option>
+              {lifeAreas?.map((area) => (
+                <option key={area.id} value={area.id}>{area.name}</option>
               ))}
             </select>
           </div>
@@ -230,7 +234,7 @@ export default function RoutineEditorPage() {
         <div className="flex gap-3 pt-2">
           <button
             type="submit"
-            disabled={isPending || !name}
+            disabled={isPending || !name || !lifeAreaId}
             className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
           >
             {isPending ? 'Saving...' : isEditing ? 'Save Changes' : 'Create Routine'}

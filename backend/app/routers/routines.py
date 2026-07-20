@@ -12,8 +12,11 @@ router = APIRouter(prefix="/api/routines", tags=["routines"])
 
 
 @router.get("", response_model=list[RoutineRead])
-async def list_routines(db: AsyncSession = Depends(get_db)):
-    result = await db.execute(select(Routine))
+async def list_routines(life_area_id: str | None = None, db: AsyncSession = Depends(get_db)):
+    stmt = select(Routine)
+    if life_area_id:
+        stmt = stmt.where(Routine.life_area_id == life_area_id)
+    result = await db.execute(stmt)
     return result.scalars().all()
 
 
@@ -30,7 +33,7 @@ async def create_routine(data: RoutineCreate, db: AsyncSession = Depends(get_db)
     routine = Routine(
         id=str(uuid.uuid4()),
         name=data.name,
-        life_area=data.life_area,
+        life_area_id=data.life_area_id,
         description=data.description,
         priority=data.priority,
         frequency_per_week=data.frequency_per_week,
