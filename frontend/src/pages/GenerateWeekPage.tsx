@@ -28,41 +28,41 @@ export default function GenerateWeekPage() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Generate Week</h1>
+      <h1 className="text-2xl font-bold text-kimbie-heading mb-6">Generate Week</h1>
 
       {!result ? (
         <>
-          <p className="text-sm text-gray-600 mb-4">Select routines to include:</p>
+          <p className="text-sm text-kimbie-muted mb-4">Select routines to include:</p>
           <div className="space-y-2 mb-6">
             {routines?.map((r) => (
-              <label key={r.id} className="flex items-center gap-3 p-3 bg-white border rounded-md cursor-pointer hover:border-indigo-300">
+              <label key={r.id} className="flex items-center gap-3 p-3 bg-kimbie-surface border border-kimbie-border rounded-md cursor-pointer hover:border-kimbie-accent">
                 <input
                   type="checkbox"
                   checked={selected.includes(r.id)}
                   onChange={() => toggle(r.id)}
-                  className="rounded text-indigo-600"
+                  className="rounded text-kimbie-accent accent-kimbie-accent"
                 />
-                <span className="text-sm font-medium text-gray-900">{r.name}</span>
-                <span className="text-xs text-gray-500 ml-auto">{r.frequencyPerWeek}x · {r.durationMinutes}min</span>
+                <span className="text-sm font-medium text-kimbie-text">{r.name}</span>
+                <span className="text-xs text-kimbie-muted ml-auto">{r.frequencyPerWeek}x · {r.durationMinutes}min</span>
               </label>
             ))}
           </div>
           <button
             onClick={handleGenerate}
             disabled={!selected.length || generateMutation.isPending}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 disabled:opacity-50"
+            className="px-4 py-2 bg-kimbie-accent text-kimbie-bg rounded-md text-sm font-medium hover:brightness-110 disabled:opacity-50"
           >
             {generateMutation.isPending ? 'Generating...' : 'Generate Week'}
           </button>
         </>
       ) : (
         <div>
-          <h2 className="text-lg font-semibold mb-4">Proposed Schedule</h2>
+          <h2 className="text-lg font-semibold text-kimbie-heading mb-4">Proposed Schedule</h2>
           <div className="space-y-2 mb-6">
             {result.events.map((event) => (
-              <div key={event.id} className="bg-white border rounded-md p-3">
-                <p className="text-sm font-medium">{event.title}</p>
-                <p className="text-xs text-gray-500">{event.start} — {event.end}</p>
+              <div key={event.id} className="bg-kimbie-surface border border-kimbie-border rounded-md p-3">
+                <p className="text-sm font-medium text-kimbie-text">{event.title}</p>
+                <p className="text-xs text-kimbie-muted">{event.start} — {event.end}</p>
               </div>
             ))}
           </div>
@@ -70,13 +70,13 @@ export default function GenerateWeekPage() {
             <button
               onClick={() => confirmMutation.mutate(result.id)}
               disabled={confirmMutation.isPending}
-              className="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700"
+              className="px-4 py-2 bg-kimbie-green text-kimbie-bg rounded-md text-sm font-medium hover:brightness-110"
             >
               Confirm & Push
             </button>
             <button
               onClick={() => setResult(null)}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-300"
+              className="px-4 py-2 bg-kimbie-panel text-kimbie-muted rounded-md text-sm font-medium hover:text-kimbie-text"
             >
               Start Over
             </button>

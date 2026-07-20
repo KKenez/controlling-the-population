@@ -10,8 +10,8 @@ const links = [
 
 export default function Sidebar() {
   return (
-    <nav className="w-56 border-r border-gray-200 bg-white flex flex-col">
-      <div className="px-4 py-5 font-bold text-lg text-gray-900">
+    <nav className="w-56 border-r border-kimbie-border bg-kimbie-panel flex flex-col">
+      <div className="px-4 py-5 font-bold text-lg text-kimbie-cream">
         CtP
       </div>
       <ul className="flex-1 space-y-1 px-2">
@@ -22,8 +22,8 @@ export default function Sidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-kimbie-bg text-kimbie-accent'
+                    : 'text-kimbie-muted hover:bg-kimbie-surface hover:text-kimbie-text'
                 }`
               }
             >
