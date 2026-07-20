@@ -1,0 +1,44 @@
+from pydantic import BaseModel
+
+
+class TimeConstraintSchema(BaseModel):
+    earliest_start: str | None = None
+    latest_end: str | None = None
+    preferred_days: list[int] | None = None
+    exclude_days: list[int] | None = None
+
+
+class RoutineCreate(BaseModel):
+    name: str
+    life_area: str
+    description: str = ""
+    priority: str
+    frequency_per_week: int
+    duration_minutes: int
+    constraints: TimeConstraintSchema = TimeConstraintSchema()
+    parameters: dict = {}
+
+
+class RoutineUpdate(BaseModel):
+    name: str | None = None
+    life_area: str | None = None
+    description: str | None = None
+    priority: str | None = None
+    frequency_per_week: int | None = None
+    duration_minutes: int | None = None
+    constraints: TimeConstraintSchema | None = None
+    parameters: dict | None = None
+
+
+class RoutineRead(BaseModel):
+    id: str
+    name: str
+    life_area: str
+    description: str
+    priority: str
+    frequency_per_week: int
+    duration_minutes: int
+    constraints: dict
+    parameters: dict
+
+    model_config = {"from_attributes": True}
