@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from app.schemas.base import CamelModel
 
 
-class EventCreate(BaseModel):
+class EventCreate(CamelModel):
     title: str
     start: str
     end: str
@@ -10,7 +10,7 @@ class EventCreate(BaseModel):
     notes: str | None = None
 
 
-class EventRead(BaseModel):
+class EventRead(CamelModel):
     id: str
     title: str
     start: str
@@ -18,5 +18,3 @@ class EventRead(BaseModel):
     source: str
     location: str | None = None
     notes: str | None = None
-
-    model_config = {"from_attributes": True}

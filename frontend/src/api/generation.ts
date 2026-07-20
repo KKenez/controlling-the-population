@@ -1,2 +1,22 @@
-// Week generation API calls
-// TODO: implement
+import type { GeneratedWeek } from '../types/generation'
+import { apiGet, apiPost } from './client'
+
+interface GenerateRequest {
+  routineIds: string[]
+  weekStart: string
+}
+
+export function generateWeek(data: GenerateRequest): Promise<GeneratedWeek> {
+  return apiPost('/api/generation', {
+    routineIds: data.routineIds,
+    weekStart: data.weekStart,
+  })
+}
+
+export function getGeneratedWeek(weekId: string): Promise<GeneratedWeek> {
+  return apiGet(`/api/generation/${weekId}`)
+}
+
+export function confirmWeek(weekId: string): Promise<{ message: string }> {
+  return apiPost(`/api/generation/${weekId}/confirm`, {})
+}

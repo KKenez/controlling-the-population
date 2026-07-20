@@ -1,14 +1,14 @@
-from pydantic import BaseModel
+from app.schemas.base import CamelModel
 
 
-class TimeConstraintSchema(BaseModel):
+class TimeConstraintSchema(CamelModel):
     earliest_start: str | None = None
     latest_end: str | None = None
     preferred_days: list[int] | None = None
     exclude_days: list[int] | None = None
 
 
-class RoutineCreate(BaseModel):
+class RoutineCreate(CamelModel):
     name: str
     life_area: str
     description: str = ""
@@ -19,7 +19,7 @@ class RoutineCreate(BaseModel):
     parameters: dict = {}
 
 
-class RoutineUpdate(BaseModel):
+class RoutineUpdate(CamelModel):
     name: str | None = None
     life_area: str | None = None
     description: str | None = None
@@ -30,7 +30,7 @@ class RoutineUpdate(BaseModel):
     parameters: dict | None = None
 
 
-class RoutineRead(BaseModel):
+class RoutineRead(CamelModel):
     id: str
     name: str
     life_area: str
@@ -40,5 +40,3 @@ class RoutineRead(BaseModel):
     duration_minutes: int
     constraints: dict
     parameters: dict
-
-    model_config = {"from_attributes": True}

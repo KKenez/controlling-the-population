@@ -1,7 +1,7 @@
-from pydantic import BaseModel
+from app.schemas.base import CamelModel
 
 
-class ProposedEventRead(BaseModel):
+class ProposedEventRead(CamelModel):
     id: str
     routine_id: str
     title: str
@@ -9,19 +9,15 @@ class ProposedEventRead(BaseModel):
     end: str
     editable: bool
 
-    model_config = {"from_attributes": True}
 
-
-class GeneratedWeekRead(BaseModel):
+class GeneratedWeekRead(CamelModel):
     id: str
     week_start: str
     status: str
     events: list[ProposedEventRead]
     created_at: str
 
-    model_config = {"from_attributes": True}
 
-
-class GenerateRequest(BaseModel):
+class GenerateRequest(CamelModel):
     routine_ids: list[str]
     week_start: str
