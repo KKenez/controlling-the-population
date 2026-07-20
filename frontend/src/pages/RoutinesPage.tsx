@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLifeAreas, useCreateLifeArea, useDeleteLifeArea } from '../hooks/useLifeAreas'
 import { useRoutines, useDeleteRoutine } from '../hooks/useRoutines'
+import EmojiPicker from '../components/common/EmojiPicker'
 import type { LifeArea, Routine } from '../types/routine'
 
 export default function RoutinesPage() {
@@ -13,12 +14,13 @@ export default function RoutinesPage() {
   const [showNewArea, setShowNewArea] = useState(false)
   const [newAreaName, setNewAreaName] = useState('')
   const [newAreaColor, setNewAreaColor] = useState('#6366f1')
+  const [newAreaIcon, setNewAreaIcon] = useState('🎯')
 
   const handleCreateArea = () => {
     if (!newAreaName.trim()) return
     createAreaMutation.mutate(
-      { name: newAreaName, color: newAreaColor, icon: 'circle', description: '' },
-      { onSuccess: () => { setNewAreaName(''); setShowNewArea(false) } }
+      { name: newAreaName, color: newAreaColor, icon: newAreaIcon, description: '' },
+      { onSuccess: () => { setNewAreaName(''); setNewAreaIcon('🎯'); setShowNewArea(false) } }
     )
   }
 
@@ -40,6 +42,7 @@ export default function RoutinesPage() {
         <div className="mb-6 bg-white border border-gray-200 rounded-lg p-4">
           <h3 className="text-sm font-medium text-gray-700 mb-3">Create Life Area</h3>
           <div className="flex gap-3 items-end">
+            <EmojiPicker value={newAreaIcon} onChange={setNewAreaIcon} />
             <div className="flex-1">
               <input
                 type="text"
@@ -84,10 +87,7 @@ export default function RoutinesPage() {
               <div key={area.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
                 <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: area.color }}
-                    />
+                    <span className="text-xl">{area.icon}</span>
                     <h2 className="text-lg font-semibold text-gray-900">{area.name}</h2>
                     <span className="text-xs text-gray-400">{routines.length} routine{routines.length !== 1 ? 's' : ''}</span>
                   </div>
