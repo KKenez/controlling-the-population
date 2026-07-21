@@ -1,7 +1,7 @@
 """Calendar sync service — pulls events from external calendar sources."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import httpx
 from icalendar import Calendar
@@ -29,25 +29,29 @@ async def sync_google_events():
     raise NotImplementedError
 
 
-async def sync_apple_calendar(db: AsyncSession) -> int:
-    """Fetch and sync events from Apple Calendar via ICS URL.
+async def sync_apple_calendar(db: AsyncSession, source: str, ics_url: str) -> int:
+    """Fetch and sync events from an Apple Calendar ICS URL.
+
+    Args:
+        source: The source label to store events under (e.g. 'apple_home', 'apple_work')
+        ics_url: The HTTPS ICS subscription URL
 
     Returns the number of events synced.
     """
-    if not settings.apple_calendar_ics_url:
-        raise ValueError("apple_calendar_ics_url not configured in .env")
+    if not ics_url:
+        raise ValueError(f"ICS URL for '{source}' not configured")
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.get(settings.apple_calendar_ics_url)
+        response = await client.get(ics_url)
         response.raise_for_status()
 
     cal = Calendar.from_ical(response.text)
 
-    # Delete existing apple events and replace with fresh data
-    await db.execute(delete(Event).where(Event.source == "apple"))
+    # Delete existing events for this source and replace with fresh data
+    await db.execute(delete(Event).where(Event.source == source))
 
     events_synced = 0
-    now = datetime.now(timezone.utc)
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
 
     for component in cal.walk():
         if component.name != "VEVENT":
@@ -73,8 +77,11 @@ async def sync_apple_calendar(db: AsyncSession) -> int:
         if end_dt.tzinfo is None:
             end_dt = end_dt.replace(tzinfo=timezone.utc)
 
+        # Convert to UTC naive datetimes for SQLite storage
+        start_dt = start_dt.astimezone(timezone.utc).replace(tzinfo=None)
+        end_dt = end_dt.astimezone(timezone.utc).replace(tzinfo=None)
+
         # Skip events older than 30 days
-        from datetime import timedelta
         if end_dt < now - timedelta(days=30):
             continue
 
@@ -86,9 +93,9 @@ async def sync_apple_calendar(db: AsyncSession) -> int:
         event = Event(
             id=str(uuid.uuid4()),
             title=summary,
-            start=start_dt.isoformat(),
-            end=end_dt.isoformat(),
-            source="apple",
+            start=start_dt,
+            end=end_dt,
+            source=source,
             location=str(location) if location else None,
             notes=str(description) if description else None,
             external_id=uid,

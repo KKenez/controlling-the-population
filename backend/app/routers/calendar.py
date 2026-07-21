@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.event import Event
 from app.schemas.event import EventRead
+from app.config import settings
 from app.services.calendar_sync import sync_apple_calendar
 
 router = APIRouter(prefix="/api/events", tags=["calendar"])
@@ -33,12 +34,19 @@ async def sync_calendars(db: AsyncSession = Depends(get_db)):
     """Trigger calendar sync from external providers."""
     results = {}
 
-    try:
-        count = await sync_apple_calendar(db)
-        results["apple"] = {"status": "ok", "events_synced": count}
-    except ValueError as e:
-        results["apple"] = {"status": "skipped", "reason": str(e)}
-    except Exception as e:
-        results["apple"] = {"status": "error", "reason": str(e)}
+    apple_calendars = {
+        "apple_home": settings.apple_home_ics_url,
+        "apple_work": settings.apple_work_ics_url,
+    }
+
+    for source, url in apple_calendars.items():
+        if not url:
+            results[source] = {"status": "skipped", "reason": "not configured"}
+            continue
+        try:
+            count = await sync_apple_calendar(db, source=source, ics_url=url)
+            results[source] = {"status": "ok", "events_synced": count}
+        except Exception as e:
+            results[source] = {"status": "error", "reason": str(e)}
 
     return {"message": "sync complete", "results": results}
