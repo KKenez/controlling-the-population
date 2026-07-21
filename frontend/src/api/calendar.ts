@@ -1,5 +1,5 @@
 import type { CalendarEvent } from '../types/event'
-import { apiGet, apiPost } from './client'
+import { apiGet, apiPost, apiPut, apiDelete } from './client'
 
 interface GetEventsParams {
   start?: string
@@ -31,4 +31,12 @@ export interface CreateEventPayload {
 
 export function createEvent(payload: CreateEventPayload): Promise<CalendarEvent> {
   return apiPost('/api/events', payload)
+}
+
+export function updateEvent(id: string, payload: CreateEventPayload): Promise<CalendarEvent> {
+  return apiPut(`/api/events/${id}`, payload)
+}
+
+export function deleteEvent(id: string): Promise<void> {
+  return apiDelete(`/api/events/${id}`)
 }

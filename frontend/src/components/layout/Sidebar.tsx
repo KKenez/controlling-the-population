@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import { Calendar, ListChecks, Sparkles, Settings } from 'lucide-react'
+import { sourceColors } from '../../utils/colors'
 
 const links = [
   { to: '/calendar', label: 'Calendar', icon: Calendar },
@@ -7,6 +8,15 @@ const links = [
   { to: '/generate', label: 'Generate', icon: Sparkles },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
+
+const SOURCE_LABELS: Record<string, string> = {
+  work1: 'Work 1',
+  work2: 'Work 2',
+  personal: 'Personal',
+  apple_home: 'Apple Home',
+  apple_work: 'Apple Work',
+  generated: 'Generated',
+}
 
 export default function Sidebar() {
   return (
@@ -33,6 +43,19 @@ export default function Sidebar() {
           </li>
         ))}
       </ul>
+
+      {/* Calendar source legend */}
+      <div className="px-4 py-4 border-t border-kimbie-border">
+        <p className="text-[10px] uppercase tracking-wider text-kimbie-muted mb-2">Calendars</p>
+        <div className="space-y-1.5">
+          {Object.entries(sourceColors).map(([source, color]) => (
+            <div key={source} className="flex items-center gap-2">
+              <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+              <span className="text-xs text-kimbie-text">{SOURCE_LABELS[source] ?? source}</span>
+            </div>
+          ))}
+        </div>
+      </div>
     </nav>
   )
 }

@@ -12,6 +12,14 @@ interface AddEventFormProps {
   }) => void
   onCancel: () => void
   isPending: boolean
+  initialValues?: {
+    title: string
+    start: string
+    end: string
+    source: string
+    location: string
+    notes: string
+  }
 }
 
 const SOURCES: { value: CalendarSource; label: string }[] = [
@@ -28,16 +36,20 @@ function toLocalDatetimeString(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
-export default function AddEventForm({ onSubmit, onCancel, isPending }: AddEventFormProps) {
+export default function AddEventForm({ onSubmit, onCancel, isPending, initialValues }: AddEventFormProps) {
   const now = new Date()
   const oneHourLater = new Date(now.getTime() + 3600000)
 
-  const [title, setTitle] = useState('')
-  const [start, setStart] = useState(toLocalDatetimeString(now))
-  const [end, setEnd] = useState(toLocalDatetimeString(oneHourLater))
-  const [source, setSource] = useState<string>('personal')
-  const [location, setLocation] = useState('')
-  const [notes, setNotes] = useState('')
+  const [title, setTitle] = useState(initialValues?.title ?? '')
+  const [start, setStart] = useState(
+    initialValues ? toLocalDatetimeString(new Date(initialValues.start)) : toLocalDatetimeString(now)
+  )
+  const [end, setEnd] = useState(
+    initialValues ? toLocalDatetimeString(new Date(initialValues.end)) : toLocalDatetimeString(oneHourLater)
+  )
+  const [source, setSource] = useState<string>(initialValues?.source ?? 'personal')
+  const [location, setLocation] = useState(initialValues?.location ?? '')
+  const [notes, setNotes] = useState(initialValues?.notes ?? '')
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

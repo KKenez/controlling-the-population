@@ -5,6 +5,7 @@ import EventCard from './EventCard'
 interface MonthViewProps {
   currentDate: Date
   events: CalendarEvent[]
+  onEventClick?: (event: CalendarEvent) => void
 }
 
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -15,7 +16,7 @@ function isAllDay(event: CalendarEvent): boolean {
   return end.getTime() - start.getTime() >= 86400000 || (start.getHours() === 0 && end.getHours() === 0 && end.getDate() !== start.getDate())
 }
 
-export default function MonthView({ currentDate, events }: MonthViewProps) {
+export default function MonthView({ currentDate, events, onEventClick }: MonthViewProps) {
   const days = getMonthDays(currentDate)
   const currentMonth = currentDate.getMonth()
 
@@ -84,7 +85,7 @@ export default function MonthView({ currentDate, events }: MonthViewProps) {
                   </div>
                   <div className="space-y-0.5">
                     {dayEvents.slice(0, 3).map((e) => (
-                      <EventCard key={e.id} event={e} compact />
+                      <EventCard key={e.id} event={e} compact onClick={() => onEventClick?.(e)} />
                     ))}
                     {dayEvents.length > 3 && (
                       <p className="text-[10px] text-kimbie-muted px-1">

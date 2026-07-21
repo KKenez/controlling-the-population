@@ -4,7 +4,8 @@ import EventCard from './EventCard'
 
 interface DayColumnProps {
   date: Date
-  events: CalendarEvent[] // expects only timed events (all-day handled by WeekView)
+  events: CalendarEvent[]
+  onEventClick?: (event: CalendarEvent) => void
 }
 
 const START_HOUR = 4
@@ -67,7 +68,7 @@ function layoutEvents(events: CalendarEvent[]): LayoutedEvent[] {
   return result
 }
 
-export default function DayColumn({ date, events }: DayColumnProps) {
+export default function DayColumn({ date, events, onEventClick }: DayColumnProps) {
   const today = isToday(date)
 
   const layouted = layoutEvents(events)
@@ -102,7 +103,7 @@ export default function DayColumn({ date, events }: DayColumnProps) {
               className="absolute overflow-hidden"
               style={{ top: `${top}px`, height: `${height}px`, width, left }}
             >
-              <EventCard event={event} />
+              <EventCard event={event} onClick={() => onEventClick?.(event)} />
             </div>
           )
         })}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -46,6 +46,33 @@ async def create_event(payload: EventCreate, db: AsyncSession = Depends(get_db))
     await db.commit()
     await db.refresh(event)
     return event
+
+
+@router.put("/{event_id}", response_model=EventRead)
+async def update_event(event_id: str, payload: EventCreate, db: AsyncSession = Depends(get_db)):
+    """Update an existing event."""
+    event = await db.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    event.title = payload.title
+    event.start = payload.start
+    event.end = payload.end
+    event.source = payload.source
+    event.location = payload.location
+    event.notes = payload.notes
+    await db.commit()
+    await db.refresh(event)
+    return event
+
+
+@router.delete("/{event_id}", status_code=204)
+async def delete_event(event_id: str, db: AsyncSession = Depends(get_db)):
+    """Delete an event."""
+    event = await db.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    await db.delete(event)
+    await db.commit()
 
 
 @router.post("/sync")

@@ -6,6 +6,7 @@ import EventCard from './EventCard'
 interface WeekViewProps {
   currentDate: Date
   events: CalendarEvent[]
+  onEventClick?: (event: CalendarEvent) => void
 }
 
 const START_HOUR = 4
@@ -17,7 +18,7 @@ function isAllDay(event: CalendarEvent): boolean {
   return end.getTime() - start.getTime() >= 86400000 || (start.getHours() === 0 && end.getHours() === 0 && end.getDate() !== start.getDate())
 }
 
-export default function WeekView({ currentDate, events }: WeekViewProps) {
+export default function WeekView({ currentDate, events, onEventClick }: WeekViewProps) {
   const days = getWeekDays(currentDate)
 
   const allDayEvents = events.filter(isAllDay)
@@ -83,7 +84,7 @@ export default function WeekView({ currentDate, events }: WeekViewProps) {
               return (
                 <div key={day.toISOString()} className="flex-1 min-w-0 px-1 py-1 border-r border-kimbie-border/50">
                   {dayAllDay.map((e) => (
-                    <EventCard key={e.id} event={e} compact />
+                    <EventCard key={e.id} event={e} compact onClick={() => onEventClick?.(e)} />
                   ))}
                 </div>
               )
@@ -113,6 +114,7 @@ export default function WeekView({ currentDate, events }: WeekViewProps) {
             key={day.toISOString()}
             date={day}
             events={timedForDay(day)}
+            onEventClick={onEventClick}
           />
         ))}
       </div>
