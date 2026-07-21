@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     google_client_id: str = ""
     google_client_secret: str = ""
 
+    # Apple Calendar (ICS subscription URL)
+    apple_calendar_ics_url: str = ""
+
     # Remote AI fallback
     openai_api_key: str = ""
 

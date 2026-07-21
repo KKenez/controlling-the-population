@@ -1,6 +1,6 @@
 // Calendar event types
 
-export type CalendarSource = 'work1' | 'work2' | 'personal' | 'generated'
+export type CalendarSource = 'work1' | 'work2' | 'personal' | 'apple' | 'generated'
 
 export interface CalendarEvent {
   id: string
