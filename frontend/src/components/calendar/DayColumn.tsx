@@ -1,10 +1,10 @@
 import type { CalendarEvent } from '../../types/event'
-import { formatDayHeader, isToday, isSameDay } from '../../utils/dates'
+import { isToday } from '../../utils/dates'
 import EventCard from './EventCard'
 
 interface DayColumnProps {
   date: Date
-  events: CalendarEvent[]
+  events: CalendarEvent[] // expects only timed events (all-day handled by WeekView)
 }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
@@ -17,35 +17,8 @@ export default function DayColumn({ date, events }: DayColumnProps) {
     (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
   )
 
-  // Separate all-day events from timed events
-  const allDayEvents = sorted.filter((e) => {
-    const start = new Date(e.start)
-    const end = new Date(e.end)
-    return end.getTime() - start.getTime() >= 86400000 || (start.getHours() === 0 && end.getHours() === 0)
-  })
-
-  const timedEvents = sorted.filter((e) => !allDayEvents.includes(e))
-
   return (
-    <div className="flex-1 min-w-0">
-      {/* Day header */}
-      <div
-        className={`sticky top-0 z-10 px-2 py-2 text-center text-xs font-medium border-b border-kimbie-border ${
-          today ? 'bg-kimbie-accent/10 text-kimbie-accent' : 'bg-kimbie-panel text-kimbie-muted'
-        }`}
-      >
-        {formatDayHeader(date)}
-      </div>
-
-      {/* All-day events */}
-      {allDayEvents.length > 0 && (
-        <div className="px-1 py-1 border-b border-kimbie-border bg-kimbie-surface/50">
-          {allDayEvents.map((e) => (
-            <EventCard key={e.id} event={e} compact />
-          ))}
-        </div>
-      )}
-
+    <div className={`flex-1 min-w-0 border-r border-kimbie-border/50 ${today ? 'bg-kimbie-accent/5' : ''}`}>
       {/* Time grid */}
       <div className="relative">
         {HOURS.map((hour) => (
@@ -56,7 +29,7 @@ export default function DayColumn({ date, events }: DayColumnProps) {
         ))}
 
         {/* Positioned timed events */}
-        {timedEvents.map((event) => {
+        {sorted.map((event) => {
           const start = new Date(event.start)
           const end = new Date(event.end)
           const topMinutes = start.getHours() * 60 + start.getMinutes()

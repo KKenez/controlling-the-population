@@ -11,6 +11,8 @@ interface CalendarToolbarProps {
   onToday: () => void
   onSync: () => void
   isSyncing: boolean
+  onReload: () => void
+  isReloading: boolean
 }
 
 export default function CalendarToolbar({
@@ -22,6 +24,8 @@ export default function CalendarToolbar({
   onToday,
   onSync,
   isSyncing,
+  onReload,
+  isReloading,
 }: CalendarToolbarProps) {
   return (
     <div className="flex items-center justify-between mb-4">
@@ -80,6 +84,13 @@ export default function CalendarToolbar({
           className="px-3 py-1.5 bg-kimbie-surface border border-kimbie-border text-kimbie-muted rounded-md text-xs font-medium hover:text-kimbie-text disabled:opacity-50"
         >
           {isSyncing ? 'Syncing...' : 'Sync'}
+        </button>
+        <button
+          onClick={onReload}
+          disabled={isReloading}
+          className="px-3 py-1.5 bg-kimbie-surface border border-kimbie-border text-kimbie-muted rounded-md text-xs font-medium hover:text-kimbie-text disabled:opacity-50"
+        >
+          {isReloading ? 'Reloading...' : 'Reload'}
         </button>
       </div>
     </div>

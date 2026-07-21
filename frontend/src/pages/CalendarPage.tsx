@@ -9,7 +9,7 @@ export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [viewMode, setViewMode] = useState<ViewMode>('week')
 
-  const { data: events, isLoading } = useEvents()
+  const { data: events, isLoading, isFetching, refetch } = useEvents()
   const syncMutation = useSyncCalendars()
 
   function handlePrev() {
@@ -35,6 +35,8 @@ export default function CalendarPage() {
         onToday={handleToday}
         onSync={() => syncMutation.mutate()}
         isSyncing={syncMutation.isPending}
+        onReload={() => refetch()}
+        isReloading={isFetching}
       />
 
       {isLoading ? (
