@@ -19,3 +19,16 @@ export function getEvents(params?: GetEventsParams): Promise<CalendarEvent[]> {
 export function syncCalendars(): Promise<{ message: string }> {
   return apiPost('/api/events/sync', {})
 }
+
+export interface CreateEventPayload {
+  title: string
+  start: string
+  end: string
+  source: string
+  location?: string
+  notes?: string
+}
+
+export function createEvent(payload: CreateEventPayload): Promise<CalendarEvent> {
+  return apiPost('/api/events', payload)
+}

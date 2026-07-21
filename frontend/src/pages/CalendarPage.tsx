@@ -1,16 +1,20 @@
 import { useState } from 'react'
-import { useEvents, useSyncCalendars } from '../hooks/useEvents'
+import { useEvents, useSyncCalendars, useCreateEvent } from '../hooks/useEvents'
 import CalendarToolbar, { type ViewMode } from '../components/calendar/CalendarToolbar'
 import WeekView from '../components/calendar/WeekView'
 import MonthView from '../components/calendar/MonthView'
+import Modal from '../components/common/Modal'
+import AddEventForm from '../components/calendar/AddEventForm'
 import { addDays, addMonths } from '../utils/dates'
 
 export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [viewMode, setViewMode] = useState<ViewMode>('week')
+  const [showAddEvent, setShowAddEvent] = useState(false)
 
   const { data: events, isLoading, isFetching, refetch } = useEvents()
   const syncMutation = useSyncCalendars()
+  const createMutation = useCreateEvent()
 
   function handlePrev() {
     setCurrentDate((d) => (viewMode === 'week' ? addDays(d, -7) : addMonths(d, -1)))
@@ -37,6 +41,7 @@ export default function CalendarPage() {
         isSyncing={syncMutation.isPending}
         onReload={() => refetch()}
         isReloading={isFetching}
+        onAdd={() => setShowAddEvent(true)}
       />
 
       {isLoading ? (
@@ -48,6 +53,19 @@ export default function CalendarPage() {
       ) : (
         <MonthView currentDate={currentDate} events={events ?? []} />
       )}
+
+      {/* Add Event Modal */}
+      <Modal open={showAddEvent} onClose={() => setShowAddEvent(false)} title="Add Event">
+        <AddEventForm
+          isPending={createMutation.isPending}
+          onCancel={() => setShowAddEvent(false)}
+          onSubmit={(data) => {
+            createMutation.mutate(data, {
+              onSuccess: () => setShowAddEvent(false),
+            })
+          }}
+        />
+      </Modal>
     </div>
   )
 }

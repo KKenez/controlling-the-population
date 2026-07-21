@@ -8,7 +8,8 @@ interface WeekViewProps {
   events: CalendarEvent[]
 }
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i)
+const START_HOUR = 4
+const HOURS = Array.from({ length: 24 }, (_, i) => (i + START_HOUR) % 24)
 
 function isAllDay(event: CalendarEvent): boolean {
   const start = new Date(event.start)
@@ -92,13 +93,14 @@ export default function WeekView({ currentDate, events }: WeekViewProps) {
       </div>
 
       {/* Scrollable time grid */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 pt-2">
         {/* Time gutter */}
-        <div className="w-12 flex-shrink-0 border-r border-kimbie-border">
-          {HOURS.map((hour) => (
+        <div className="w-12 flex-shrink-0 border-r border-kimbie-border relative" style={{ height: `${24 * 48}px` }}>
+          {HOURS.map((hour, i) => (
             <div
               key={hour}
-              className="h-12 flex items-start justify-end pr-1 text-[10px] text-kimbie-muted -mt-2"
+              className="absolute right-0 pr-1 text-[10px] text-kimbie-muted -translate-y-1/2"
+              style={{ top: `${i * 48}px` }}
             >
               {hour.toString().padStart(2, '0')}:00
             </div>

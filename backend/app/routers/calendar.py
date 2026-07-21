@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.event import Event
-from app.schemas.event import EventRead
+from app.schemas.event import EventCreate, EventRead
 from app.config import settings
 from app.services.calendar_sync import sync_apple_calendar
 
@@ -27,6 +27,25 @@ async def get_events(
         stmt = stmt.where(Event.source == source)
     result = await db.execute(stmt)
     return result.scalars().all()
+
+
+@router.post("", response_model=EventRead, status_code=201)
+async def create_event(payload: EventCreate, db: AsyncSession = Depends(get_db)):
+    """Create a new manual event."""
+    import uuid
+    event = Event(
+        id=str(uuid.uuid4()),
+        title=payload.title,
+        start=payload.start,
+        end=payload.end,
+        source=payload.source,
+        location=payload.location,
+        notes=payload.notes,
+    )
+    db.add(event)
+    await db.commit()
+    await db.refresh(event)
+    return event
 
 
 @router.post("/sync")
