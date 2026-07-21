@@ -102,10 +102,16 @@ frontend/
 ## Pages Detail
 
 ### CalendarPage
-- Default: current week, 7 columns, hourly rows
-- Events color-coded by source (Work 1 = blue, Work 2 = teal, Personal = green, AI-generated = purple)
-- Toolbar: navigate weeks, "Generate this week" button
-- Click event → detail popover (read-only in MVP)
+- Default: current week, 7 columns, hourly rows (starts at 04:00, wraps to 03:00)
+- Week and Month view toggle
+- Events color-coded by source (Work 1 = blue, Work 2 = teal, Personal = green, Apple Home = orange, Apple Work = red, AI-generated = purple)
+- Overlapping events render side-by-side in week view
+- All-day events in sticky header row (week view) or inline (month view)
+- Toolbar: navigate weeks/months, view toggle, Sync, Reload, + Add buttons
+- Click event → EventDetailModal (view details, edit in-place, delete with confirmation)
+- Add Event modal with source selector, datetime pickers, location, notes
+- Auto-syncs Apple calendars on page load
+- Source color legend in sidebar
 
 ### RoutinesPage
 - Grid/list of routine cards (name, life area badge, frequency)

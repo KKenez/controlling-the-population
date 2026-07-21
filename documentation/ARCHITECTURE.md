@@ -154,16 +154,19 @@ An AI agent runs on the backend (locally on the laptop or via subscription LLM) 
 
 ## Calendar Integration Details
 
-| Calendar       | Provider | API                    | Auth              |
-|----------------|----------|------------------------|--------------------|
-| Work 1         | Outlook  | MS Graph API           | OAuth 2.0 (Azure AD) |
-| Work 2         | Outlook  | MS Graph API           | OAuth 2.0 (Azure AD) |
-| Personal       | Google   | Google Calendar API    | OAuth 2.0 (Google)   |
+| Calendar       | Provider | API                    | Auth / Method         | Status |
+|----------------|----------|------------------------|-----------------------|--------|
+| Apple Home     | Apple    | ICS subscription URL   | Public ICS link       | ✅ Done |
+| Apple Work     | Apple    | ICS subscription URL   | Public ICS link       | ✅ Done |
+| Work 1         | Outlook  | Manual entry           | N/A (org blocks ICS)  | ✅ Manual |
+| Work 2         | Outlook  | Manual entry           | N/A (org blocks ICS)  | ✅ Manual |
+| Personal       | Google   | Google Calendar API    | OAuth 2.0 (Google)    | ⬜ Future |
 
 **Notes:**
-- Could consolidate personal to Apple Calendar (CalDAV) or Outlook — decision open
-- All calendars support two-way sync via their respective APIs
-- The system is the "source of truth" for AI-generated events; external calendars are the source of truth for externally-created events
+- Apple calendars sync via ICS subscription URLs (fetched + parsed with `icalendar` library)
+- Work Outlook calendars cannot be synced automatically — org policy blocks ICS publishing and MS Graph registration is not feasible. Events are added manually via the UI.
+- The system is the "source of truth" for AI-generated and manually-added events; Apple ICS feeds are the source of truth for Apple calendar events
+- Google Calendar integration deferred to future scope
 
 ---
 
@@ -191,10 +194,11 @@ An AI agent runs on the backend (locally on the laptop or via subscription LLM) 
 - [x] Two interfaces: iPhone (view/quick actions) + PC (full management)
 - [x] Backend runs on local Windows laptop
 - [x] LLM: local-first with remote fallback option
+- [x] PC web UI framework: **React 18 + Vite + TypeScript + Tailwind CSS**
+- [x] Backend language/framework: **Python 3.12+ / FastAPI / SQLAlchemy (async)**
+- [x] Database: **SQLite** (via aiosqlite)
+- [x] Calendar sync: **Apple ICS** (automated), **Outlook** (manual entry)
 - [ ] iPhone framework: SwiftUI native vs React Native vs Flutter
-- [ ] PC web UI framework: React, Svelte, or plain HTML
-- [ ] Backend language/framework: Python (FastAPI), Node (Express), or other
-- [ ] Database: SQLite vs Postgres
 - [ ] How to expose laptop server to iPhone (local network, tunnel, VPN?)
 - [ ] Notification infrastructure for iPhone
 
