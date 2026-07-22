@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from app.schemas.base import CamelModel
 
 
@@ -15,7 +17,7 @@ class GeneratedWeekRead(CamelModel):
     week_start: str
     status: str
     events: list[ProposedEventRead]
-    created_at: str
+    created_at: datetime | str
 
 
 class GenerateRequest(CamelModel):

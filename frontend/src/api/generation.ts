@@ -6,6 +6,17 @@ interface GenerateRequest {
   weekStart: string
 }
 
+export interface AiStatus {
+  ollamaReachable: boolean
+  model: string
+  modelReady: boolean
+  availableModels: string[]
+}
+
+export function getAiStatus(): Promise<AiStatus> {
+  return apiGet('/api/generation/ai/status')
+}
+
 export function generateWeek(data: GenerateRequest): Promise<GeneratedWeek> {
   return apiPost('/api/generation', {
     routineIds: data.routineIds,

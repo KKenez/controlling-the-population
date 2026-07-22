@@ -1,5 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { generateWeek, getGeneratedWeek, confirmWeek } from '../api/generation'
+import { generateWeek, getGeneratedWeek, confirmWeek, getAiStatus } from '../api/generation'
+
+export function useAiStatus() {
+  return useQuery({
+    queryKey: ['ai-status'],
+    queryFn: getAiStatus,
+    refetchInterval: 10_000,
+  })
+}
 
 export function useGenerateWeek() {
   const queryClient = useQueryClient()

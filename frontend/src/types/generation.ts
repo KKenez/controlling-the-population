@@ -1,11 +1,13 @@
 // Week generation types
 
-import type { CalendarEvent } from './event'
-
 export type GenerationStatus = 'idle' | 'selecting' | 'chatting' | 'generating' | 'reviewing' | 'confirmed'
 
-export interface ProposedEvent extends CalendarEvent {
+export interface ProposedEvent {
+  id: string
   routineId: string
+  title: string
+  start: string
+  end: string
   editable: boolean
 }
 

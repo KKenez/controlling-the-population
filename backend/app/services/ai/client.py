@@ -16,7 +16,7 @@ class OllamaClient(LLMClient):
         self.model = settings.ollama_model
 
     async def generate(self, prompt: str) -> str:
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=300.0) as client:
             response = await client.post(
                 f"{self.base_url}/api/generate",
                 json={"model": self.model, "prompt": prompt, "stream": False},

@@ -25,8 +25,8 @@ class ProposedEvent(Base):
     generated_week_id: Mapped[str] = mapped_column(ForeignKey("generated_weeks.id"), nullable=False)
     routine_id: Mapped[str] = mapped_column(String, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
-    start: Mapped[str] = mapped_column(DateTime, nullable=False)
-    end: Mapped[str] = mapped_column(DateTime, nullable=False)
+    start: Mapped[str] = mapped_column(String, nullable=False)
+    end: Mapped[str] = mapped_column(String, nullable=False)
     editable: Mapped[bool] = mapped_column(Boolean, default=True)
 
     generated_week: Mapped["GeneratedWeek"] = relationship(back_populates="events")
