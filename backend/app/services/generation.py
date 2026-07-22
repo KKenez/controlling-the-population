@@ -68,8 +68,8 @@ async def confirm_week(week: GeneratedWeek, db: AsyncSession) -> list[Event]:
         event = Event(
             id=str(uuid.uuid4()),
             title=pe.title,
-            start=pe.start,
-            end=pe.end,
+            start=datetime.fromisoformat(pe.start),
+            end=datetime.fromisoformat(pe.end),
             source="generated",
             notes=f"Generated from routine {pe.routine_id}",
         )

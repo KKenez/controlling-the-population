@@ -45,19 +45,19 @@ export default function GenerateWeekPage() {
       <h1 className="text-2xl font-bold text-kimbie-heading mb-6">Generate Week</h1>
 
       {/* AI Status Banner */}
-      {aiStatus && !aiStatus.ollamaReachable && (
+      {aiStatus && !aiStatus.ollama_reachable && (
         <div className="mb-4 p-3 bg-kimbie-red/10 border border-kimbie-red/30 rounded-md">
           <p className="text-sm text-kimbie-red font-medium">Ollama is not running</p>
           <p className="text-xs text-kimbie-muted mt-1">Start Ollama to enable AI generation. Run <code className="bg-kimbie-bg px-1 rounded">ollama serve</code> in a terminal.</p>
         </div>
       )}
-      {aiStatus && aiStatus.ollamaReachable && !aiStatus.modelReady && (
+      {aiStatus && aiStatus.ollama_reachable && !aiStatus.model_ready && (
         <div className="mb-4 p-3 bg-kimbie-yellow/10 border border-kimbie-yellow/30 rounded-md">
           <p className="text-sm text-kimbie-yellow font-medium">Model not downloaded</p>
           <p className="text-xs text-kimbie-muted mt-1">Run <code className="bg-kimbie-bg px-1 rounded">ollama pull {aiStatus.model}</code> to download the model.</p>
         </div>
       )}
-      {aiStatus && aiStatus.modelReady && (
+      {aiStatus && aiStatus.model_ready && (
         <div className="mb-4 p-3 bg-kimbie-green/10 border border-kimbie-green/30 rounded-md">
           <p className="text-sm text-kimbie-green font-medium">AI ready — {aiStatus.model}</p>
         </div>
@@ -99,7 +99,7 @@ export default function GenerateWeekPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleGenerate}
-                  disabled={!selected.length || generateMutation.isPending || (aiStatus && !aiStatus.modelReady)}
+                  disabled={!selected.length || generateMutation.isPending || (aiStatus && !aiStatus.model_ready)}
                   className="px-4 py-2 bg-kimbie-accent text-kimbie-bg rounded-md text-sm font-medium hover:brightness-110 disabled:opacity-50"
                 >
                   {generateMutation.isPending ? 'Generating...' : 'Generate Week'}

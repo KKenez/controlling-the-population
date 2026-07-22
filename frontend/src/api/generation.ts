@@ -7,10 +7,10 @@ interface GenerateRequest {
 }
 
 export interface AiStatus {
-  ollamaReachable: boolean
+  ollama_reachable: boolean
   model: string
-  modelReady: boolean
-  availableModels: string[]
+  model_ready: boolean
+  available_models: string[]
 }
 
 export function getAiStatus(): Promise<AiStatus> {
