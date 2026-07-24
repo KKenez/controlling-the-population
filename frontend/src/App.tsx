@@ -8,6 +8,7 @@ import BacklogPage from './pages/BacklogPage'
 import NotesPage from './pages/NotesPage'
 import DashboardPage from './pages/DashboardPage'
 import DayReviewPage from './pages/DayReviewPage'
+import BudgetPage from './pages/BudgetPage'
 import Sidebar from './components/layout/Sidebar'
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/backlog" element={<BacklogPage />} />
           <Route path="/notes" element={<NotesPage />} />
           <Route path="/review" element={<DayReviewPage />} />
+          <Route path="/budget" element={<BudgetPage />} />
           <Route path="/generate" element={<GenerateWeekPage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Routes>

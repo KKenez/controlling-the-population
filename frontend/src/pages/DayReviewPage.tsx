@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useEvents } from '../hooks/useEvents'
 import { useCreateReview, useReviews } from '../hooks/useReviews'
+import { useBudgetConfig, useCategories, useParseSpending, useCreateExpenses } from '../hooks/useBudget'
 import type { EventReviewData } from '../api/reviews'
 import type { CalendarEvent } from '../types/event'
+import type { ParsedExpenseItem } from '../types/budget'
 
 type ReviewStatus = 'completed' | 'skipped' | 'partial' | 'dismissed'
 
@@ -21,9 +23,18 @@ export default function DayReviewPage() {
   const [eventStates, setEventStates] = useState<EventReviewState[]>([])
   const [step, setStep] = useState<'select' | 'review' | 'done'>('select')
 
+  // Spending state
+  const [spendingText, setSpendingText] = useState('')
+  const [parsedItems, setParsedItems] = useState<ParsedExpenseItem[] | null>(null)
+  const [spendingSaved, setSpendingSaved] = useState(false)
+
   const { data: events } = useEvents()
   const { data: existingReviews } = useReviews()
   const createMutation = useCreateReview()
+  const { data: budgetConfig } = useBudgetConfig()
+  const { data: categories } = useCategories()
+  const parseMutation = useParseSpending()
+  const confirmExpenses = useCreateExpenses()
 
   // Filter events for the selected date
   const dayEvents = useMemo(() => {
@@ -194,6 +205,74 @@ export default function DayReviewPage() {
                 />
               </div>
             ))}
+          </div>
+
+          {/* Spending Input */}
+          <div className="bg-kimbie-surface border border-kimbie-border rounded-lg p-4 mb-6">
+            <h3 className="text-sm font-medium text-kimbie-text mb-3">💰 What did you spend today?</h3>
+            {spendingSaved ? (
+              <p className="text-xs text-kimbie-green">✓ Spending logged!</p>
+            ) : (
+              <>
+                <textarea
+                  value={spendingText}
+                  onChange={(e) => setSpendingText(e.target.value)}
+                  placeholder="e.g. Spar 42, lunch 15, Bolt 8, Netflix 12.99"
+                  rows={2}
+                  className="w-full px-3 py-2 bg-kimbie-bg border border-kimbie-border rounded-md text-xs text-kimbie-text placeholder-kimbie-muted focus:outline-none focus:ring-1 focus:ring-kimbie-accent mb-2"
+                />
+                {!parsedItems && (
+                  <button
+                    onClick={() => {
+                      if (!spendingText.trim()) return
+                      parseMutation.mutate(
+                        { text: spendingText, date: reviewDate, currency: budgetConfig?.currency || 'EUR' },
+                        { onSuccess: (data) => setParsedItems(data.items) }
+                      )
+                    }}
+                    disabled={!spendingText.trim() || parseMutation.isPending}
+                    className="px-3 py-1.5 bg-kimbie-accent text-kimbie-bg rounded-md text-xs font-medium hover:brightness-110 disabled:opacity-50"
+                  >
+                    {parseMutation.isPending ? 'Parsing...' : 'Parse'}
+                  </button>
+                )}
+                {parsedItems && (
+                  <div className="space-y-1 mb-2">
+                    {parsedItems.map((item, i) => {
+                      const cat = categories?.find((c) => c.name === item.categoryName)
+                      return (
+                        <div key={i} className="flex items-center justify-between text-xs bg-kimbie-bg rounded px-2 py-1">
+                          <span>{cat?.emoji || '💰'} {item.description} <span className="text-kimbie-muted">({item.categoryName})</span></span>
+                          <span className="font-medium">€{item.amount.toFixed(2)}</span>
+                        </div>
+                      )
+                    })}
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => {
+                          if (!categories) return
+                          const items = parsedItems.map((item) => {
+                            const cat = categories.find((c) => c.name === item.categoryName)
+                            return { amount: item.amount, categoryId: cat?.id || categories[categories.length - 1].id, description: item.description, rawText: item.originalText }
+                          })
+                          confirmExpenses.mutate({ date: reviewDate, items }, { onSuccess: () => { setSpendingSaved(true); setParsedItems(null) } })
+                        }}
+                        disabled={confirmExpenses.isPending}
+                        className="px-3 py-1 bg-kimbie-green text-kimbie-bg rounded text-xs font-medium hover:brightness-110 disabled:opacity-50"
+                      >
+                        ✓ Confirm
+                      </button>
+                      <button
+                        onClick={() => setParsedItems(null)}
+                        className="px-3 py-1 text-xs text-kimbie-muted hover:text-kimbie-text"
+                      >
+                        Redo
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Overall Notes */}

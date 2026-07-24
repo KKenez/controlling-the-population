@@ -7,9 +7,11 @@ from app.models.quest import Quest
 from app.models.note import Note
 from app.models.review import DailyReview, EventReview
 from app.models.scheduler import SchedulerConfig, GenerationLog
+from app.models.budget import BudgetConfig, ExpenseCategory, Expense, SpendingSummary
 
 __all__ = [
     "LifeArea", "Event", "Routine", "GeneratedWeek", "ProposedEvent",
     "Goal", "Quest", "Note", "DailyReview", "EventReview",
     "SchedulerConfig", "GenerationLog",
+    "BudgetConfig", "ExpenseCategory", "Expense", "SpendingSummary",
 ]

@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db, async_session
 from app.models.scheduler import SchedulerConfig
 from app.routers import calendar, life_areas, routines, generation, goals, quests, notes
-from app.routers import reviews, scheduler
+from app.routers import reviews, scheduler, budget
 
 logger = logging.getLogger(__name__)
 
@@ -77,6 +77,7 @@ app.include_router(quests.router)
 app.include_router(notes.router)
 app.include_router(reviews.router)
 app.include_router(scheduler.router)
+app.include_router(budget.router)
 
 
 @app.get("/health")
