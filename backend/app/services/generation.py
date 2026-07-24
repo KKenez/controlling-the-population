@@ -11,6 +11,7 @@ from app.models.event import Event
 from app.models.generation import GeneratedWeek, ProposedEvent
 from app.models.routine import Routine
 from app.models.note import Note
+from app.models.review import DailyReview
 from app.services.ai.client import get_llm_client
 
 
@@ -36,8 +37,18 @@ async def generate_week(routine_ids: list[str], week_start: str, db: AsyncSessio
     )
     notes = notes_result.scalars().all()
 
+    # Load recent reviews (last 14 days) for AI feedback loop
+    two_weeks_ago = (datetime.utcnow() - timedelta(days=14)).strftime("%Y-%m-%d")
+    reviews_result = await db.execute(
+        select(DailyReview)
+        .options(selectinload(DailyReview.event_reviews))
+        .where(DailyReview.date >= two_weeks_ago)
+        .order_by(DailyReview.date.desc())
+    )
+    recent_reviews = reviews_result.scalars().all()
+
     llm = get_llm_client()
-    prompt = _build_prompt(routines, week_start, existing_events, notes)
+    prompt = _build_prompt(routines, week_start, existing_events, notes, recent_reviews)
     response = await llm.generate(prompt)
 
     proposed_events = _parse_ai_response(response, routines)
@@ -88,7 +99,7 @@ async def confirm_week(week: GeneratedWeek, db: AsyncSession) -> list[Event]:
     return created_events
 
 
-def _build_prompt(routines: list[Routine], week_start: str, existing_events: list[Event], notes: list | None = None) -> str:
+def _build_prompt(routines: list[Routine], week_start: str, existing_events: list[Event], notes: list | None = None, reviews: list | None = None) -> str:
     week_start_dt = datetime.fromisoformat(week_start)
     days = [(week_start_dt + timedelta(days=i)).strftime("%A %Y-%m-%d") for i in range(7)]
     days_text = ", ".join(days)
@@ -141,6 +152,26 @@ QUICK NOTES (one-off items to also schedule this week):
 - For each note, create an appropriate event with a reasonable duration (30-60 min unless context suggests otherwise)
 - Use "note" as the routine_id for note-derived events"""
 
+    reviews_section = ""
+    if reviews:
+        review_lines = []
+        for rev in reviews:
+            for er in rev.event_reviews:
+                if er.feedback or er.status in ("skipped", "partial"):
+                    line = f"  - {rev.date}: \"{er.event_title}\" → {er.status}"
+                    if er.feedback:
+                        line += f" (feedback: {er.feedback})"
+                    if er.actual_duration_minutes:
+                        line += f" [actual: {er.actual_duration_minutes}min]"
+                    review_lines.append(line)
+        if review_lines:
+            reviews_section = f"""
+
+USER FEEDBACK FROM RECENT WEEKS (use this to improve scheduling):
+{chr(10).join(review_lines[:20])}
+- Adjust timing, duration, or day preferences based on this feedback
+- If user consistently skips events at certain times, avoid those times"""
+
     return f"""You are a scheduling assistant. Generate a weekly schedule.
 
 WEEK: {days_text}
@@ -149,7 +180,7 @@ ROUTINES TO SCHEDULE:
 {routines_json}
 
 ALREADY BLOCKED TIME SLOTS (do NOT overlap with these):
-{blocked_slots}{notes_section}
+{blocked_slots}{notes_section}{reviews_section}
 
 RULES:
 - Schedule each routine exactly the number of sessions_per_week specified

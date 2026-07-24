@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Calendar, ListChecks, Sparkles, Settings, LayoutDashboard, Archive, StickyNote } from 'lucide-react'
+import { Calendar, ListChecks, Sparkles, Settings, LayoutDashboard, Archive, StickyNote, ClipboardCheck } from 'lucide-react'
 import { sourceColors } from '../../utils/colors'
 
 const links = [
@@ -8,6 +8,7 @@ const links = [
   { to: '/routines', label: 'Routines', icon: ListChecks },
   { to: '/backlog', label: 'Goals & Quests', icon: Archive },
   { to: '/notes', label: 'Quick Notes', icon: StickyNote },
+  { to: '/review', label: 'Day Review', icon: ClipboardCheck },
   { to: '/generate', label: 'Generate', icon: Sparkles },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
