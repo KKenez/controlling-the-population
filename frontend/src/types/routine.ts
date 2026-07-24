@@ -22,6 +22,7 @@ export interface Routine {
   id: string
   name: string
   lifeAreaId: string
+  goalId: string | null
   description: string
   priority: PriorityLevel
   frequencyPerWeek: number

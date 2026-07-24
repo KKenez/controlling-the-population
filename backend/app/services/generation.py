@@ -10,6 +10,7 @@ from sqlalchemy.orm import selectinload
 from app.models.event import Event
 from app.models.generation import GeneratedWeek, ProposedEvent
 from app.models.routine import Routine
+from app.models.note import Note
 from app.services.ai.client import get_llm_client
 
 
@@ -29,8 +30,14 @@ async def generate_week(routine_ids: list[str], week_start: str, db: AsyncSessio
     )
     existing_events = existing_result.scalars().all()
 
+    # Load unresolved quick notes
+    notes_result = await db.execute(
+        select(Note).where(Note.resolved == False)
+    )
+    notes = notes_result.scalars().all()
+
     llm = get_llm_client()
-    prompt = _build_prompt(routines, week_start, existing_events)
+    prompt = _build_prompt(routines, week_start, existing_events, notes)
     response = await llm.generate(prompt)
 
     proposed_events = _parse_ai_response(response, routines)
@@ -81,7 +88,7 @@ async def confirm_week(week: GeneratedWeek, db: AsyncSession) -> list[Event]:
     return created_events
 
 
-def _build_prompt(routines: list[Routine], week_start: str, existing_events: list[Event]) -> str:
+def _build_prompt(routines: list[Routine], week_start: str, existing_events: list[Event], notes: list | None = None) -> str:
     week_start_dt = datetime.fromisoformat(week_start)
     days = [(week_start_dt + timedelta(days=i)).strftime("%A %Y-%m-%d") for i in range(7)]
     days_text = ", ".join(days)
@@ -121,6 +128,19 @@ def _build_prompt(routines: list[Routine], week_start: str, existing_events: lis
     else:
         blocked_slots = "  (none — the week is currently empty)"
 
+    notes_section = ""
+    if notes:
+        note_lines = []
+        for n in notes:
+            hint = f" (hint: {n.due_hint})" if n.due_hint else ""
+            note_lines.append(f"  - {n.text}{hint}")
+        notes_section = f"""
+
+QUICK NOTES (one-off items to also schedule this week):
+{chr(10).join(note_lines)}
+- For each note, create an appropriate event with a reasonable duration (30-60 min unless context suggests otherwise)
+- Use "note" as the routine_id for note-derived events"""
+
     return f"""You are a scheduling assistant. Generate a weekly schedule.
 
 WEEK: {days_text}
@@ -129,7 +149,7 @@ ROUTINES TO SCHEDULE:
 {routines_json}
 
 ALREADY BLOCKED TIME SLOTS (do NOT overlap with these):
-{blocked_slots}
+{blocked_slots}{notes_section}
 
 RULES:
 - Schedule each routine exactly the number of sessions_per_week specified

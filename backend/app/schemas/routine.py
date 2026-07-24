@@ -11,6 +11,7 @@ class TimeConstraintSchema(CamelModel):
 class RoutineCreate(CamelModel):
     name: str
     life_area_id: str
+    goal_id: str | None = None
     description: str = ""
     priority: str
     frequency_per_week: int
@@ -22,6 +23,7 @@ class RoutineCreate(CamelModel):
 class RoutineUpdate(CamelModel):
     name: str | None = None
     life_area_id: str | None = None
+    goal_id: str | None = None
     description: str | None = None
     priority: str | None = None
     frequency_per_week: int | None = None
@@ -34,6 +36,7 @@ class RoutineRead(CamelModel):
     id: str
     name: str
     life_area_id: str
+    goal_id: str | None = None
     description: str
     priority: str
     frequency_per_week: int

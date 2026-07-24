@@ -44,6 +44,7 @@ export default function RoutineEditorPage() {
     const data = {
       name,
       lifeAreaId,
+      goalId: null,
       description,
       priority,
       frequencyPerWeek,

@@ -1,10 +1,13 @@
 import { NavLink } from 'react-router-dom'
-import { Calendar, ListChecks, Sparkles, Settings } from 'lucide-react'
+import { Calendar, ListChecks, Sparkles, Settings, LayoutDashboard, Archive, StickyNote } from 'lucide-react'
 import { sourceColors } from '../../utils/colors'
 
 const links = [
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/calendar', label: 'Calendar', icon: Calendar },
   { to: '/routines', label: 'Routines', icon: ListChecks },
+  { to: '/backlog', label: 'Goals & Quests', icon: Archive },
+  { to: '/notes', label: 'Quick Notes', icon: StickyNote },
   { to: '/generate', label: 'Generate', icon: Sparkles },
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
